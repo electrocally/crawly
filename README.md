@@ -6,24 +6,24 @@ A quick and dirty script to find content inside a folder (and inside a folder (a
 ## Usage
 
 Crawly is built using click, so its pretty descriptive for different options
-```python
+```bash
 $ python3 crawly.py --help
 ```
 
 A couple options:
 
 ### Simple search 
-```python
+```bash
 $ python3 crawly.py thing
 ```
 
 ### Case Sensitive search 
-```python
+```bash
 $ python3 crawly.py Thing --case
 ```
 
 ### Regex search 
-```python
+```bash
 $ python3 crawly.py '^Thing$' --regex
 ```
 
