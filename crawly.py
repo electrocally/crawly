@@ -1,8 +1,9 @@
 import os
 import re
+import json
+import docx
 import click
 import fileinput
-import json
 
 @click.command()
 @click.argument('string')
@@ -12,7 +13,7 @@ import json
 @click.option('--verbose', '-v', is_flag=True, help="Print more output")
 @click.option('--directory', '-d', default='.', help='The root directory to check')
 
-# Yes this should all be split into classes etc
+# Yes this should all be split into classes etc. I am *Aware*
 def main(string, directory, verbose, regex, replace, case):
         def log(message):
             if verbose:
@@ -45,7 +46,29 @@ def main(string, directory, verbose, regex, replace, case):
                 else:
                     search = string.lower()
                     liner = line.lower()
-
+        
+        def extract_from_word(full_name):
+            doc = docx.Document(full_name)
+            text = []
+            for para in doc.paragraphs:
+                text.append(para.text)
+            return text
+        
+        #Pure shite. I'll fix this 'later'. Don't read this is you're considering employing me.
+        def check(read_obj):
+            for line in read_obj:
+                if regex:
+                    reg = re.findall(string, line)
+                    if len(reg) > 0:
+                        for find in reg:
+                            if find in line:
+                                list_build(full_name, find, line)
+                                deface(line, find, replace, full_name)
+                
+                check_case(string, line)
+                if string in line:
+                    list_build(full_name, search, line)
+                    deface(line, search, replace, full_name)
         try:
             files = []
             root_dir = directory
@@ -57,28 +80,20 @@ def main(string, directory, verbose, regex, replace, case):
                     log(f'  ├── {fname}')
                     full_name = dir_name+'/'+fname
                     
-                    #Pure shite. I'll fix this 'later'. Don't read this is you're considering employing me.
-                    with open(full_name) as read_obj:
-                        for line in read_obj:
-                            if regex:
-                                reg = re.findall(string, line)
-                                if len(reg) > 0:
-                                    for find in reg:
-                                        if find in line:
-                                            list_build(full_name, find, line)
-                                            deface(line, find, replace, full_name)
-
-                            check_case(string, line)
-
-                            if string in line:
-                                list_build(full_name, search, line)
-                                deface(line, search, replace, full_name)
-                            
+                    if full_name.endswith('.docx'):
+                         check(extract_from_word(full_name))
+                    else:
+                        with open(full_name) as read_obj:
+                            check(read_obj)
+                        
                     def list_build(file, content, line):
                         files.append({ 'File' : file, 'Content' : content, "Line": line })
 
             if not replace and len(files) != 0:
                 print('\n[+] Discovered Files:\n\n%s' % json.dumps(files, indent=4))
+            
+            else:
+                print('[-] No Results')
 
         except Exception as e: 
             print(f'[-] Search Failed. Please see error below:\n\t{e}')
