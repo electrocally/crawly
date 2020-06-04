@@ -74,20 +74,23 @@ def main(string, directory, verbose, regex, replace, case):
             root_dir = directory
             log('[+] Discovered Directory Structure:\n')
 
-            for dir_name, subdir_list, file_list in os.walk(root_dir):
+            for dir_name, subdir_list, file_list in os.walk(root_dir): 
                 log(f'└── {dir_name}')
                 for fname in file_list:
                     log(f'  ├── {fname}')
                     full_name = dir_name+'/'+fname
                     
-                    if full_name.endswith('.docx'):
-                         check(extract_from_word(full_name))
-                    else:
-                        with open(full_name) as read_obj:
-                            check(read_obj)
-                        
-                    def list_build(file, content, line):
-                        files.append({ 'File' : file, 'Content' : content, "Line": line })
+                    if full_name.lower().endswith(('.docx', '.html', '.txt', '.md')):
+                        if fname.startswith('~$'):
+                            print(f"Possible open file, cannot scan file in this state: {full_name}")
+                        if full_name.lower().endswith('.docx'):
+                            check(extract_from_word(full_name))
+                        else:
+                            with open(full_name) as read_obj:
+                                check(read_obj)
+                            
+                        def list_build(file, content, line):
+                            files.append({ 'File' : file, 'Content' : content, "Line": line })
 
             if not replace and len(files) != 0:
                 print('\n[+] Discovered Files:\n\n%s' % json.dumps(files, indent=4))
