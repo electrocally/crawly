@@ -53,6 +53,16 @@ def main(string, directory, verbose, regex, replace, case):
         def extract_from_word(full_name):
             doc = docx.Document(full_name)
             text = []
+            ### Headers and Footers
+            section = doc.sections[0]
+            header = section.header
+            for head in header.paragraphs:
+                text.append(head.text)
+            footer = section.footer
+            for foot in footer.paragraphs:
+                text.append(foot.text)
+                
+            ### Paragraphs
             for para in doc.paragraphs:
                 text.append(para.text)
             return text
