@@ -36,6 +36,9 @@ def main(string, directory, verbose, regex, replace, case):
             except Exception as e:
                 print(e)
         
+        def list_build(file, content, line):
+            files.append({ 'File' : file, 'Content' : content, "Line": line })
+
         def check_case(string, line):
             if not regex:
                 global search
@@ -89,9 +92,6 @@ def main(string, directory, verbose, regex, replace, case):
                             with open(full_name) as read_obj:
                                 check(read_obj)
                             
-                        def list_build(file, content, line):
-                            files.append({ 'File' : file, 'Content' : content, "Line": line })
-
             if not replace and len(files) != 0:
                 print('\n[+] Discovered Files:\n\n%s' % json.dumps(files, indent=4))
             
